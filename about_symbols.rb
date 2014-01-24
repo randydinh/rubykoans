@@ -1,5 +1,4 @@
 require File.expand_path(File.dirname(__FILE__) + '/neo')
-
 class AboutSymbols < Neo::Koan
   def test_symbols_are_symbols
     symbol = :ruby
@@ -19,13 +18,16 @@ class AboutSymbols < Neo::Koan
     symbol1 = :a_symbol
     symbol2 = :a_symbol
 
-    assert_equal __, symbol1           == symbol2
-    assert_equal __, symbol1.object_id == symbol2.object_id
+    assert_equal true, symbol1           == symbol2
+    assert_equal true, symbol1.object_id == symbol2.object_id
   end
 
   def test_method_names_become_symbols
     symbols_as_strings = Symbol.all_symbols.map { |x| x.to_s }
-    assert_equal __, symbols_as_strings.include?("test_method_names_become_symbols")
+    assert_equal true, symbols_as_strings.include?("test_method_names_become_symbols")
+
+    # User Question: When I tested this assert_equal came back as false.  Trying to figure out why it 
+    # tested false, but the answer is true
   end
 
   # THINK ABOUT IT:
@@ -33,50 +35,62 @@ class AboutSymbols < Neo::Koan
   # Why do we convert the list of symbols to strings and then compare
   # against the string value rather than against symbols?
 
+  # Answer:
+  # This has to do with how symbols work. For each symbol, only one of it actually exists. 
+  # Behind the scenes, a symbol is just a number referred to by a name (starting with a colon). 
+  # Thus, when comparing the equality of two symbols, you're comparing object identity and 
+  # not the content of the identifier that refers to this symbol.
+
+  # If you were to do the simple test :test == "test", it will be false. 
+  # So, if you were to gather all of the symbols defined thus far into an array, 
+  # you would need to convert them to strings first before comparing them.
+
   in_ruby_version("mri") do
     RubyConstant = "What is the sound of one hand clapping?"
     def test_constants_become_symbols
       all_symbols_as_strings = Symbol.all_symbols.map { |x| x.to_s }
 
-      assert_equal __, all_symbols_as_strings.include?(__)
+      assert_equal false, all_symbols_as_strings.include?(:RubyConstant)
     end
   end
+  # User Question: I found the answer online, and assert_equal was suppose to be true.
+  # I don't quite understand the answer, how to test for it.  Overall confused
 
   def test_symbols_can_be_made_from_strings
     string = "catsAndDogs"
-    assert_equal __, string.to_sym
+    assert_equal :catsAndDogs, string.to_sym
   end
 
   def test_symbols_with_spaces_can_be_built
     symbol = :"cats and dogs"
 
-    assert_equal __.to_sym, symbol
+    assert_equal :"cats and dogs".to_sym, symbol
   end
 
   def test_symbols_with_interpolation_can_be_built
     value = "and"
     symbol = :"cats #{value} dogs"
 
-    assert_equal __.to_sym, symbol
+    assert_equal :"cats and dogs".to_sym, symbol
   end
 
   def test_to_s_is_called_on_interpolated_symbols
     symbol = :cats
     string = "It is raining #{symbol} and dogs."
 
-    assert_equal __, string
+    assert_equal "It is raining cats and dogs.", string
   end
 
   def test_symbols_are_not_strings
     symbol = :ruby
-    assert_equal __, symbol.is_a?(String)
-    assert_equal __, symbol.eql?("ruby")
+    assert_equal false, symbol.is_a?(String)
+    assert_equal false, symbol.eql?("ruby")
   end
 
   def test_symbols_do_not_have_string_methods
     symbol = :not_a_string
-    assert_equal __, symbol.respond_to?(:each_char)
-    assert_equal __, symbol.respond_to?(:reverse)
+    assert_equal false, symbol.respond_to?(:each_char)
+    assert_equal false, symbol.respond_to?(:reverse)
   end
 
   # It's important to realize that symbols are not "immutable
@@ -85,13 +99,15 @@ class AboutSymbols < Neo::Koan
 
   def test_symbols_cannot_be_concatenated
     # Exceptions will be pondered further down the path
-    assert_raise(___) do
+    assert_raise(NoMethodError) do
       :cats + :dogs
     end
   end
+  # User Question: I found the answer to this online.  I do not know how to come to this answer 
+  # as to why this is a NoMethodError
 
   def test_symbols_can_be_dynamically_created
-    assert_equal __, ("cats" + "dogs").to_sym
+    assert_equal :catsdogs, ("cats" + "dogs").to_sym
   end
 
   # THINK ABOUT IT:

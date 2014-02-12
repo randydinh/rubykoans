@@ -1,23 +1,54 @@
 require File.expand_path(File.dirname(__FILE__) + '/neo')
 
-# Greed is a dice game where you roll up to five dice to accumulate
-# points.  The following "score" function will be used to calculate the
-# score of a single roll of the dice.
-#
-# A greed roll is scored as follows:
-#
-# * A set of three ones is 1000 points
-#
-# * A set of three numbers (other than ones) is worth 100 times the
-#   number. (e.g. three fives is 500 points).
-#
-# * A one (that is not part of a set of three) is worth 100 points.
-#
-# * A five (that is not part of a set of three) is worth 50 points.
-#
-# * Everything else is worth 0 points.
-#
-#
+# # Greed is a dice game where you roll up to five dice to accumulate
+# # points.  The following "score" function will be used to calculate the
+# # score of a single roll of the dice.
+# #
+# # A greed roll is scored as follows:
+# #
+# # * A set of three ones is 1000 points
+# #
+
+# result = dice.select { |die| die == 1 }
+# score += 1000 if result.count == 3
+
+
+# # * A set of three numbers (other than ones) is worth 100 times the
+# #   number. (e.g. three fives is 500 points).
+# #
+
+# (2..6).each do |n|
+#   result = dice.select { |die| die = n }
+#   score += (n*100) if result.count == 3
+# end
+
+
+
+
+
+
+# # * A one (that is not part of a set of three) is worth 100 points.
+# #
+
+# result = dice.select { |die| die == 1 }
+# score += (100 * result.count) if result.count < 3
+# score += 1000 + (100 * (result.count - 3)) if result.count > 3 
+
+
+
+
+# # * A five (that is not part of a set of three) is worth 50 points.
+# #
+# # * Everything else is worth 0 points.
+# #
+
+# result = dice.select { |die| die == 5}
+# score += (50 * result.count) if result.count < 3
+# score += 500 +(50 * (result.count - 3)) if result.count > 3
+
+
+
+
 # Examples:
 #
 # score([1,1,1,5,1]) => 1150 points
@@ -30,7 +61,29 @@ require File.expand_path(File.dirname(__FILE__) + '/neo')
 # Your goal is to write the score method.
 
 def score(dice)
-  # You need to write this method
+  return 0 if dice.empty? or dice.nil?
+
+  score = 0
+  
+  result = dice.select { |die| die == 5 }
+  score += 50 * result.count if result.count < 3
+  score += 500 + (50 * (result.count - 3)) if result.count > 3
+
+
+  result = dice.select { |die| die == 1 }
+  score += 1000 if result.count == 3
+
+  (2..6).each do |n|
+  result = dice.select { |die| die == n }
+  score += (n*100) if result.count == 3
+  end
+
+  result = dice.select { |die| die == 1 }
+  score += (100 * result.count) if result.count < 3
+  score += 1000 + (100 * (result.count - 3)) if result.count > 3 
+
+  score
+
 end
 
 class AboutScoringProject < Neo::Koan
